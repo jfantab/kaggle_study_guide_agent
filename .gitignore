@@ -26,7 +26,6 @@ Thumbs.db
 
 # Specific to this project
 outputs/
-img/
 *.log
 *.sqlite3
 my_agent_data.db
