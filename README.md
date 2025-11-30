@@ -89,7 +89,78 @@ For a topic like "Photosynthesis", the agent:
 - **Context maintenance**: Structured state passing via output_key parameters
 - **Section assembly**: Dedicated assembler creates unified document
 
-## Testing
+## Deployment
+
+### Prerequisites
+
+1. **Google Cloud Project** with the following APIs enabled:
+   - Vertex AI API
+   - Cloud Build API
+   - Agent Engine API
+
+2. **Environment Variables** - Create a `.env` file:
+   ```bash
+   GOOGLE_CLOUD_PROJECT=your-project-id
+   GOOGLE_CLOUD_LOCATION=us-central1
+   FIRECRAWL_API_KEY=your-firecrawl-api-key  # Optional, for web research
+   ```
+
+3. **Authentication**:
+   ```bash
+   gcloud auth login
+   gcloud config set project YOUR_PROJECT_ID
+   gcloud auth application-default login
+   ```
+
+### Deploy to Vertex AI Agent Engine
+
+1. **Install Dependencies**:
+   ```bash
+   pip install -r study_guide_agent/requirements.txt
+   ```
+
+2. **Set Environment Variables**:
+   ```bash
+   export PROJECT_ID=your-project-id
+   ```
+
+3. **Deploy the Agent**:
+
+   The deployment script will:
+   - Clean up any existing agent with the same name
+   - Deploy to Vertex AI Agent Engine with custom configuration
+
+   ```bash
+   ./deploy_study_guide_agent.sh
+   ```
+
+   This runs:
+   ```bash
+   python3 cleanup.py study_guide_agent
+   adk deploy agent_engine --project=$PROJECT_ID --region=us-west1 study_guide_agent --agent_engine_config_file=study_guide_agent/.agent_engine_config.json
+   ```
+
+**Agent Engine Configuration** ([.agent_engine_config.json](study_guide_agent/.agent_engine_config.json)):
+- Min instances: 0 (scales to zero when idle)
+- Max instances: 1
+- Resources: 4 CPU, 8Gi memory
+
+### Local Testing
+
+Run the agent locally with extended timeouts:
+```bash
+./run_web_with_timeout.sh
+```
+
+This sets appropriate timeouts for network stability and starts the web server at `http://localhost:8000`.
+
+Alternatively, run directly:
+```bash
+cd study_guide_agent
+adk web
+```
+
+### Testing the Deployed Agent
 
 Test the deployed agent with sample text:
 ```bash
@@ -101,12 +172,6 @@ python3 py_scripts/test_study_guide_agent.py
 Test with PDF files:
 ```bash
 python3 py_scripts/test_study_guide_agent_pdf.py ./pdfs/research_paper.pdf
-```
-
-Local testing:
-```bash
-cd study_guide_agent
-adk web
 ```
 
 ## Future Improvements
