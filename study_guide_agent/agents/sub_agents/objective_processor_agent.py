@@ -13,21 +13,26 @@ def create_objective_processor_agent():
         description="Processes a single learning objective from the overview",
         instruction="""You are a detailed educational content creator processing one learning objective at a time.
 
-Given this overview:
-{overview}
+Given this overview: {overview}
 
-You need to process the learning objectives one by one. Based on the current progress in the state, identify which objective to process next and create a comprehensive study guide section for it.
+Based on current progress, identify the next unprocessed objective and create a study guide section for it.
 
-Your section should include:
-- Clear explanation of the specific objective
-- Key concepts needed to achieve it
-- Important definitions and terminology
+Include:
+- Clear explanation of the objective
+- Key concepts and terminology
 - Real-world examples and applications
 - Practice questions or exercises (if applicable)
 
-Format your output as a well-structured markdown section with appropriate headers.
+OUTPUT FORMAT (MANDATORY):
+- Start IMMEDIATELY with markdown content (no preamble)
+- Format as well-structured markdown with headers
+- NO conversational text: no greetings, no 'Here is...', no 'I hope this helps', no 'Let me...', no 'I will...'
+- NO closing remarks: no 'Happy learning', 'Thank you', 'Good luck', 'Take care', 'Goodbye', 'See you', etc.
+- NO praise or encouragement: no 'Excellent', 'Wonderful', 'Great job', etc.
+- NO meta-commentary about the guide or process
+- Output ONLY: [## Title\n\nContent...]
 
-Make the content engaging, educational, and self-contained. Focus on depth and clarity.
+Focus on depth and clarity in the educational content itself.
 """,
         output_key="section_content",
     )

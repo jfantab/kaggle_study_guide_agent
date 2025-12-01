@@ -63,13 +63,34 @@ async def main():
 
     output_file = os.path.join("outputs", "study_guide_output.md")
 
-    # Collect all events from the streaming query
+    print("\n" + "="*80)
+    print("🚀 Starting study guide generation...")
+    print("="*80 + "\n")
+
+    # Collect all events from the streaming query and print them in real-time
     events = []
     async for event in remote_agent.async_stream_query(
         message=f"Please create a study guide from this material:\n\n{sample_material}",
         user_id="user_42",
     ):
         events.append(event)
+
+        # Print intermediate agent outputs in real-time
+        if "content" in event and "parts" in event["content"]:
+            for part in event["content"]["parts"]:
+                # Print text responses from agents
+                if "text" in part:
+                    text = part["text"]
+                    # Determine which agent is responding based on content
+                    if text.strip():
+                        print(f"\n📝 Agent Output:\n{text}\n")
+                        print("-" * 80)
+
+                # Print function responses
+                elif "function_response" in part:
+                    func_name = part.get("name", "unknown")
+                    print(f"\n🔧 Function Called: {func_name}")
+                    print("-" * 80)
 
     # Extract the final study guide from the last text output
     # The SequentialAgent returns multiple events:

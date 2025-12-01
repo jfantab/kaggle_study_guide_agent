@@ -1,14 +1,5 @@
 from google.adk.agents import Agent
-from google.adk.tools import FunctionTool
-
-
-def exit_loop():
-    """Signal loop completion - all objectives have been processed
-
-    This function MUST be called when all learning objectives have been
-    successfully processed and we're ready to move to the assembly stage.
-    """
-    return {"status": "done", "message": "All learning objectives have been processed"}
+from google.adk.tools import exit_loop
 
 
 def create_loop_controller_agent():
@@ -19,20 +10,33 @@ def create_loop_controller_agent():
     """
     return Agent(
         name="LoopControllerAgent",
-        model="gemini-2.5-flash-lite",
+        model="gemini-2.5-pro",
         description="Manages iteration through learning objectives and controls loop exit",
-        instruction="""You are the loop controller. Your ONLY job is to count completed sections and call the exit_loop tool when done.
+        instruction="""You are the loop controller. Your job is to track progress and call exit_loop ONLY when ALL objectives are complete.
 
-Count the learning objectives in the overview: {overview}
+COUNTING LOGIC:
+1. Look at {overview} - count how many "Learning Objectives" are listed (look for numbered list under "## Learning Objectives")
+2. Look at {section_content} - this accumulates ALL completed sections from previous iterations
+3. Count how many complete sections are in {section_content} (count ## headers that correspond to objectives)
+4. Compare: completed_sections vs total_objectives
 
-Count how many sections have been completed by looking at the section_content output.
+DECISION RULES:
+- If completed_sections < total_objectives: OUTPUT NOTHING
+- If completed_sections >= total_objectives: Call exit_loop() tool
 
-IMPORTANT RULES:
-- If the number of completed sections equals the total number of learning objectives: YOU MUST call the exit_loop() tool immediately. Do NOT write any text - just call the tool.
-- If more sections remain: Simply acknowledge that processing should continue.
+CRITICAL: WHEN CONTINUING THE LOOP, OUTPUT ABSOLUTELY NOTHING.
+- Do not write any words at all
+- Do not write punctuation
+- Do not write empty strings
+- Just output nothing - end your turn immediately without any text
+- Your response must be completely empty (zero characters)
 
-DO NOT write summaries, reviews, or additional content. Your sole purpose is to call exit_loop() when all objectives are processed.
+When all objectives are complete: Call exit_loop() tool only (no text).
+
+DO NOT write anything ever except calling exit_loop when done.
+
+IMPORTANT: The loop will run multiple times. Each time, {section_content} will contain MORE sections than before. Only exit when you see ALL objectives completed in {section_content}.
 """,
-        tools=[FunctionTool(exit_loop)],
+        tools=[exit_loop],
         output_key="loop_status",
     )

@@ -176,12 +176,28 @@ Test with PDF files:
 python3 py_scripts/test_study_guide_agent_pdf.py ./pdfs/research_paper.pdf
 ```
 
+## MCP Tools Limitations
+
+**Important Note:** The Firecrawl MCP tools are configured for **local development only** and **do not work when deployed to Vertex AI Agent Engine**.
+
+### Why MCP Tools Don't Work in Deployment:
+- **Serialization issues**: MCP stdio connections cannot be deep copied/pickled for deployment
+- **Runtime requirements**: Requires Node.js/npx in containerized environments
+- **Agent Engine limitations**: The deployment API cannot serialize MCP toolset objects
+
+### Current Behavior:
+- **Local Development** (`adk web`): MCP tools work perfectly for web research capabilities
+- **Deployment** (Vertex AI Agent Engine): Agent deploys without MCP tools and generates study guides based solely on user-provided content
+
+### Workaround:
+To enable web research in production, consider migrating from MCP to REST API-based tools using Firecrawl's Python SDK directly with ADK FunctionTool.
+
 ## Future Improvements
 
 - **Dynamic max iterations** - Automatically set `max_iterations` based on number of learning objectives
 - **Section-level critique** - Add review step for each section within the loop
 - **Parallel section processing** - Process independent objectives in parallel for faster generation
-- **Web research integration** - Use MCP tools to enrich content with current information
+- **Web research in production** - Migrate from MCP to REST API-based Firecrawl Python SDK for deployment compatibility
 - **Quiz generation** - Add companion quiz creation for each study guide
 - **Multi-modal content** - Generate diagrams, charts, and visual aids alongside text
 
