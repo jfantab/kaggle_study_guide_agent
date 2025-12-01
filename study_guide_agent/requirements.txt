@@ -3,3 +3,4 @@ opentelemetry-instrumentation-google-genai
 mcp
 python-dotenv
 google-cloud-aiplatform
+firecrawl-py

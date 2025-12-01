@@ -17,7 +17,7 @@ load_dotenv()
 # Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-west1")
-AGENT_NAME = "study-guide-agent"
+AGENT_NAME = "study_guide_agent"
 STAGING_BUCKET = f"gs://{PROJECT_ID}-agent-staging"  # Or use existing bucket
 
 # Initialize Vertex AI
@@ -26,6 +26,24 @@ vertexai.init(project=PROJECT_ID, location=LOCATION, staging_bucket=STAGING_BUCK
 print(f"Deploying {AGENT_NAME} to Vertex AI Agent Engine...")
 print(f"Project: {PROJECT_ID}")
 print(f"Location: {LOCATION}")
+
+# Clean up existing deployment
+print(f"\n🧹 Cleaning up existing {AGENT_NAME} deployment...")
+try:
+    agents_list = list(agent_engines.list())
+    existing_agent = next((agent for agent in agents_list if agent.display_name == AGENT_NAME), None)
+
+    if existing_agent:
+        print(f"Found existing agent: {existing_agent.resource_name}")
+        agent_engines.delete(resource_name=existing_agent.resource_name, force=True)
+        print(f"✅ Deleted existing agent")
+    else:
+        print(f"No existing agent found with name '{AGENT_NAME}'")
+except Exception as e:
+    print(f"⚠️ Cleanup warning: {e}")
+    print("Continuing with deployment...")
+
+print()
 
 # Import the agent
 from study_guide_agent.agent import root_agent
@@ -41,17 +59,13 @@ remote_agent = agent_engines.create(
         "mcp",
         "python-dotenv",
         "google-cloud-aiplatform",
+        "firecrawl-py",
     ],
     extra_packages=[
-        "study_guide_agent/installation_scripts/install_nodejs_mcp.sh",
+        "study_guide_agent",  # Include entire agent directory with tools
     ],
     env_vars={
         "FIRECRAWL_API_KEY": os.getenv("FIRECRAWL_API_KEY", ""),
-    },
-    build_options={
-        "installation": [
-            "bash study_guide_agent/installation_scripts/install_nodejs_mcp.sh",
-        ],
     },
 )
 
