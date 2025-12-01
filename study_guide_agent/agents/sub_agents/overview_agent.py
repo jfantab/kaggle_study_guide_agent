@@ -27,8 +27,6 @@ def create_overview_agent():
 **Your Task:**
 Analyze the provided study material and create a comprehensive high-level overview.
 
-The firecrawl_search tool is
-
 **Step 1: Assess the Input**
 - If the user provides ONLY a topic name (e.g., "quantum computing" or "photosynthesis"), use firecrawl_search to gather context
 - If the user provides detailed text or material, skip to Step 2

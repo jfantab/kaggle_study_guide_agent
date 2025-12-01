@@ -37,6 +37,8 @@ Four-stage sequential pipeline with iterative processing:
 3. **Assembler agent** - Combines all processed sections into a cohesive study guide with table of contents
 4. **Judge agent** - Final polish, adds welcome message and study tips, provides quality seal
 
+![The architecture of the study guide agent](./img/architecture.png)
+
 ## How It Works
 
 1. **Overview agent** - Creates structure with 3-5 learning objectives and difficulty assessment
